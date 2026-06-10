@@ -1,46 +1,143 @@
-from collections import Counter
 import re
+from collections import Counter
+
+def count_specific_word(text, search_word):
+    """
+    Counts the number of occurrences of a specific word.
+    Returns an integer.
+    """
+    words = re.findall(r'\b\w+\b', text.lower())
+
+    count = 0
+
+    for word in words:
+        if word == search_word.lower():
+            count += 1
+
+    return count
 
 
-def count_specific_word(text: str, word: str) -> int:
-    return text.lower().split().count(word.lower())
+def identify_most_common_word(text):
+    """
+    Identifies the most common word in the text.
+    Returns the word as a string.
+    Returns None for an empty string.
+    """
+    if text.strip() == "":
+        return None
+
+    words = re.findall(r'\b\w+\b', text.lower())
+
+    if len(words) == 0:
+        return None
+
+    word_counts = Counter(words)
+
+    return word_counts.most_common(1)[0][0]
 
 
-def identify_most_common_word(text: str) -> str | None:
-    words = text.lower().split()
-    return Counter(words).most_common(1)[0][0] if words else None
+def calculate_average_word_length(text):
+    """
+    Calculates the average word length.
+    Returns a float.
+    Returns 0 for an empty string.
+    """
+    words = re.findall(r'\b\w+\b', text)
+
+    if len(words) == 0:
+        return 0
+
+    total_length = 0
+
+    for word in words:
+        total_length += len(word)
+
+    return total_length / len(words)
 
 
-def calculate_average_word_length(text: str) -> float:
-    words = [re.sub(r'[^a-zA-Z0-9]', '', w) for w in text.split()]
-    words = [w for w in words if w]
-    return sum(len(w) for w in words) / len(words) if words else 0
+def count_paragraphs(text):
+    """
+    Counts paragraphs based on blank lines.
+    Returns an integer.
+    Returns 1 for an empty string.
+    """
+    if text.strip() == "":
+        return 1
+
+    paragraphs = [paragraph for paragraph in text.split("\n\n") if paragraph.strip()]
+
+    return len(paragraphs)
 
 
-def count_paragraphs(text: str) -> int:
-    paragraphs = [p for p in re.split(r'\n\s*\n', text) if p.strip()]
-    return len(paragraphs) if paragraphs else 1
+def count_sentences(text):
+    """
+    Counts sentences based on periods, exclamation marks, and question marks.
+    Returns an integer.
+    Returns 1 for an empty string.
+    """
+    if text.strip() == "":
+        return 1
+
+    sentences = re.split(r'[.!?]+', text)
+
+    count = 0
+
+    for sentence in sentences:
+        if sentence.strip():
+            count += 1
+
+    return count
 
 
-def count_sentences(text: str) -> int:
-    sentences = re.findall(r'[^.!?]*[.!?]', text)
-    return len(sentences) if sentences else 1
+# Read the news article from the text file
+try:
+    with open("news_article.txt", "r", encoding="utf-8") as file:
+        article_text = file.read()
+
+except FileNotFoundError:
+    print("Error: news_article.txt was not found.")
+    article_text = ""
 
 
-sample_text = "The quick brown fox jumps over the lazy dog. The dog barked."
-search_word = "the"
+if __name__ == "__main__":
 
-count = count_specific_word(sample_text, search_word)
-print(f'The word "{search_word}" appears {count} time(s).')
+    # While loop required by rubric
+    while True:
 
-most_common = identify_most_common_word(sample_text)
-print(f'The most common word is: "{most_common}".')
+        search_word = input(
+            "\nEnter a word to search for (or type 'quit' to exit): "
+        )
 
-avg_length = calculate_average_word_length(sample_text)
-print(f'The average word length is: {avg_length:.2f}.')
+        # If/Else statement required by rubric
+        if search_word.lower() == "quit":
+            print("Program ended.")
+            break
 
-paragraph_count = count_paragraphs(sample_text)
-print(f'The number of paragraphs is: {paragraph_count}.')
+        else:
+            specific_word_count = count_specific_word(
+                article_text,
+                search_word
+            )
 
-sentence_count = count_sentences(sample_text)
-print(f'The number of sentences is: {sentence_count}.')
+            most_common_word = identify_most_common_word(
+                article_text
+            )
+
+            average_word_length = calculate_average_word_length(
+                article_text
+            )
+
+            paragraph_count = count_paragraphs(
+                article_text
+            )
+
+            sentence_count = count_sentences(
+                article_text
+            )
+
+            print("\n===== NEWS ARTICLE ANALYSIS =====")
+            print(f"Occurrences of '{search_word}': {specific_word_count}")
+            print(f"Most common word: {most_common_word}")
+            print(f"Average word length: {average_word_length:.2f}")
+            print(f"Number of paragraphs: {paragraph_count}")
+            print(f"Number of sentences: {sentence_count}")
